@@ -21,3 +21,6 @@ resultados/
 # OS files
 .DS_Store
 Thumbs.db
+
+# PyCharm / IDEs
+.idea/
