@@ -1,0 +1,9 @@
+# /requirements.txt
+
+transformers
+torch
+pandas
+matplotlib
+tabulate
+requests
+python-dotenv
