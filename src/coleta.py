@@ -1,9 +1,20 @@
 # /src/coleta.py
 
 import requests
-from src.config import API_BEARER_TOKEN
+from src.config import API_BEARER_TOKEN, HASHTAGS_SPFC
+import re
+import emoji
 
 BASE_URL = "https://api.twitter.com/2/tweets/search/recent"
+
+def limpar_texto(texto):
+    texto = texto.lower()
+    texto = re.sub(r"http\S+", "", texto)          # remove URLs
+    texto = re.sub(r"@\S+", "", texto)             # remove menções
+    texto = re.sub(r"#\S+", "", texto)             # remove hashtags
+    texto = emoji.demojize(texto)                  # emojis para palavras
+    texto = texto.strip()
+    return texto
 
 def coletar_tweets(janela, limite, perfil):
     inicio, fim = janela
@@ -11,7 +22,10 @@ def coletar_tweets(janela, limite, perfil):
     fim_iso = fim.isoformat("T") + "Z"
 
     headers = {"Authorization": f"Bearer {API_BEARER_TOKEN}"}
-    query = f"to:{perfil}"
+
+    # Query combinando respostas ao perfil oficial + hashtags
+    hashtags_query = " OR ".join(HASHTAGS_SPFC)
+    query = f"(to:{perfil} OR {hashtags_query}) lang:pt"
 
     params = {
         "query": query,
@@ -34,6 +48,7 @@ def coletar_tweets(janela, limite, perfil):
                 "texto": t["text"],
                 "retweets": t.get("public_metrics", {}).get("retweet_count", 0),
                 "likes": t.get("public_metrics", {}).get("like_count", 0),
+                "texto_limpo": limpar_texto(t["text"]),  # <-- nova coluna
                 "timestamp": t["created_at"],
                 "janela": inicio
             }

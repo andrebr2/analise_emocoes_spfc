@@ -12,7 +12,7 @@ CORES_EMOCOES = {
     "medo": "#9b59b6"        # roxo
 }
 
-def gerar_grafico_barras(percentuais, pasta_resultados, titulo="Distribuição de Emoções"):
+def gerar_grafico_barras(percentuais, pasta_resultados, identificador_jogo, titulo="Distribuição de Emoções"):
     emocoes = list(percentuais.keys())
     valores = list(percentuais.values())
     cores = [CORES_EMOCOES.get(e, "#95a5a6") for e in emocoes]
@@ -27,11 +27,12 @@ def gerar_grafico_barras(percentuais, pasta_resultados, titulo="Distribuição d
 
     plt.tight_layout()
 
-    caminho = os.path.join(pasta_resultados, "grafico_emocoes.png")
+    # Salva o gráfico com identificador do jogo para evitar sobrescrita
+    caminho = os.path.join(pasta_resultados, f"grafico_emocoes_{identificador_jogo}.png")
     plt.savefig(caminho)
-    plt.show()
+    plt.close()  # Não abre janela, fecha a figura
 
-def gerar_tabela_resumo(percentuais_etapas, pasta_resultados):
+def gerar_tabela_resumo(percentuais_etapas, pasta_resultados, identificador_jogo):
     tabela = []
     for etapa, perc in percentuais_etapas.items():
         pred = max(perc, key=perc.get) if perc else None
@@ -46,6 +47,7 @@ def gerar_tabela_resumo(percentuais_etapas, pasta_resultados):
 
     print(tabela_formatada)
 
-    caminho = os.path.join(pasta_resultados, "tabela_resumo.txt")
+    # Salva a tabela com identificador do jogo para evitar sobrescrita
+    caminho = os.path.join(pasta_resultados, f"tabela_resumo_{identificador_jogo}.txt")
     with open(caminho, "w", encoding="utf-8") as f:
         f.write(tabela_formatada)

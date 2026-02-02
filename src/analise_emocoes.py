@@ -25,20 +25,27 @@ MAPEAMENTO = {
 }
 
 def classificar_emocao(tweet_texto):
-    resultados = classifier(tweet_texto)
+    resultados = classifier(tweet_texto, top_k=None)
+
+    # se for lista de listas, achamos o primeiro elemento
+    if isinstance(resultados[0], list):
+        resultados = resultados[0]
+
     if not resultados:
         return "neutro", 0.0
 
-    for r in sorted(resultados, key=lambda x: x['score'], reverse=True):
-        label_modelo = r['label'].lower()
-        if label_modelo in MAPEAMENTO:
-            return MAPEAMENTO[label_modelo], r["score"]
+    # pegamos o resultado de maior score
+    r_max = max(resultados, key=lambda x: x['score'])
+    label_modelo = r_max['label'].lower()
+    score = r_max['score']
 
-    return "neutro", 0.0
+    if label_modelo in MAPEAMENTO:
+        return MAPEAMENTO[label_modelo], score
+
+    return "neutro", score
+
 
 def analisar_tweets(tweets):
     for tweet in tweets:
-        emocao, confianca = classificar_emocao(tweet["texto"])
-        tweet["emocao"] = emocao
-        tweet["confianca"] = confianca
+        tweet["emocao"], tweet["confianca"] = classificar_emocao(tweet["texto"])
     return tweets

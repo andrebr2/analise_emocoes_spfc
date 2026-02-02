@@ -23,3 +23,14 @@ EMOCOES = ["alegria", "raiva", "tristeza", "surpresa", "medo"]
 
 # Duração das janelas em minutos
 DURACAO_JANELA = 15
+
+# Hashtags associada ao clube
+HASHTAGS_SPFC = [
+    "#SPFC",
+    "#SãoPauloFC",
+    "#VamosSãoPaulo",
+    "#Tricolores",
+    "#saopaulofc",
+    "#spfc",
+    "#tricolores"
+]
