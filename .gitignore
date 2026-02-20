@@ -24,3 +24,8 @@ Thumbs.db
 
 # PyCharm / IDEs
 .idea/
+
+# Modelos treinados (muito grandes)
+modelo_torcedor_spfc/
+*.bin
+*.safetensors

@@ -4,7 +4,12 @@ transformers
 torch
 pandas
 matplotlib
+seaborn
 tabulate
 requests
 python-dotenv
 emoji
+scikit-learn
+datasets
+accelerate
+evaluate

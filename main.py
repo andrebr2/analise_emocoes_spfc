@@ -3,11 +3,41 @@
 from datetime import datetime
 from src.janelas import calcular_janelas
 from src.coleta import coletar_tweets
-from src.utils import criar_pasta_resultados, salvar_tweets_csv, salvar_tweets_json
+from src.utils import criar_pasta_resultados, salvar_tweets_csv
 from src.analise_emocoes import analisar_tweets
 from src.agregacao import percentual_emocoes
 from src.visualizacao import gerar_grafico_barras, gerar_tabela_resumo
 from src.config import PERFIL_SPFC, LIMITE_PRE_JOGO, LIMITE_DURANTE_POS
+import os
+from src.config import MODELO_PATH
+
+# ==================================================
+# VERIFICAÇÃO INICIAL DO MODELO
+# ==================================================
+def verificar_modelo():
+    """
+    Verifica se o modelo fine-tuning existe antes de começar a coleta.
+    """
+    modelo_dir = os.path.join(MODELO_PATH, "final")
+    if not os.path.exists(modelo_dir):
+        print("\n" + "="*60)
+        print("ERRO: Modelo fine-tuning não encontrado!")
+        print("="*60)
+        print(f"Pasta esperada: {modelo_dir}")
+        print("\nVocê precisa executar o fine-tuning primeiro:")
+        print("  python -m src.fine_tuning")
+        print("\nOu verifique se o modelo foi salvo no local correto.")
+        print("="*60)
+        return False
+    return True
+
+# ==================================================
+# EXECUÇÃO PRINCIPAL
+# ==================================================
+
+# Verifica modelo antes de prosseguir
+if not verificar_modelo():
+    exit(1)
 
 # Entrada do usuário
 adversario = input("Adversário: ")
@@ -19,7 +49,7 @@ hora_inicio_jogo = datetime.strptime(f"{data_jogo} {hora_jogo}", "%d-%m-%Y %H:%M
 data_hora = data_jogo.replace("-", "") + "_" + hora_jogo.replace(":", "")
 
 # Pastas
-pasta_resultados, pasta_data = criar_pasta_resultados(adversario, data_hora)
+pasta_data, pasta_resultados = criar_pasta_resultados(adversario, data_hora)
 
 # Janelas
 janelas = calcular_janelas(hora_inicio_jogo)
@@ -31,7 +61,6 @@ def processar_etapa(janelas_etapa, limite, nome_etapa):
         tweets_janela = coletar_tweets(janela, limite, PERFIL_SPFC)
         tweets_analisados = analisar_tweets(tweets_janela)
         salvar_tweets_csv(tweets_analisados, pasta_data, nome_etapa, janela[0])
-        salvar_tweets_json(tweets_analisados, pasta_data, nome_etapa, janela[0])
         todos_tweets_etapa += tweets_analisados
     return todos_tweets_etapa
 

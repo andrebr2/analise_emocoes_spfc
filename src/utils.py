@@ -39,25 +39,3 @@ def salvar_tweets_csv(tweets, pasta_data, etapa, janela_inicio):
     df.to_csv(path, index=False, encoding="utf-8")
 
     print(f"[INFO] Janela salva em CSV: {path}")
-
-
-import json
-from datetime import datetime
-
-def salvar_tweets_json(tweets, pasta_data, nome_etapa, inicio_janela):
-    # converte datetimes em strings
-    tweets_serializaveis = []
-    for t in tweets:
-        t_copy = t.copy()
-        for k in ["timestamp", "janela"]:
-            if isinstance(t_copy.get(k), datetime):
-                t_copy[k] = t_copy[k].isoformat()
-        tweets_serializaveis.append(t_copy)
-
-    filename = f"{nome_etapa}_{inicio_janela.strftime('%Y%m%d_%H%M')}.json"
-    path = os.path.join(pasta_data, filename)
-
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(tweets_serializaveis, f, ensure_ascii=False, indent=4)
-
-    print(f"[INFO] Janela salva em JSON: {path}")

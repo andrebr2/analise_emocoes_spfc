@@ -15,12 +15,14 @@ O protótipo coleta tweets:
   - Pré-jogo: 75 tweets  
   - Durante e pós-jogo: 100 tweets  
 
-A classificação de emoções é feita usando o modelo **multilingual_go_emotions_V1.2**, mapeado para 5 categorias relevantes para o TCC:
-- Alegria
+A classificação de emoções é feita usando o modelo **BERTimbau (neuralmind/bert-base-portuguese-cased)** fine-tuning com um dataset manual de 1.412 tweets rotulados.
+
+As 5 categorias de emoção analisadas são:
 - Raiva
-- Tristeza
-- Surpresa
-- Medo
+- Alegria
+- Frustração
+- Ironia
+- Neutro
 
 ---
 
@@ -31,7 +33,7 @@ analise_emocoes/                  # Raiz do projeto
 ├── main.py                        # Script principal para rodar todo o fluxo  
 ├── .env                           # Variáveis de ambiente (ex.: token da API do X)  
 ├── requirements.txt               # Dependências do projeto  
-├── README.md                       # Documentação do projeto  
+├── README.md                      # Documentação do projeto  
 │  
 ├── data/                           # Pasta para armazenar dados brutos coletados  
 │   └── SPFC_vs_<adversario>_<data_hora>/  
@@ -42,7 +44,13 @@ analise_emocoes/                  # Raiz do projeto
 │       ├── pos_jogo_YYYYMMDD_HHMM.csv  
 │       └── pos_jogo_YYYYMMDD_HHMM.json  
 │
-├── resultados/                     # Pasta opcional para análises ou gráficos finais  
+├── modelo_torcedor_spfc/          # Modelo BERTimbau fine-tuning (criado após treinamento)
+│   └── final/                      # Versão final do modelo
+│       ├── config.json
+│       ├── model.safetensors
+│       └── tokenizer_config.json
+│
+├── resultados/                     # Pasta para gráficos e tabelas finais  
 │   └── SPFC_vs_<adversario>_<data_hora>/  
 │       ├── grafico_emocoes.png  
 │       └── tabela_resumo.txt  
@@ -52,14 +60,13 @@ analise_emocoes/                  # Raiz do projeto
 │   ├── config.py                   # Carrega o token do .env e outras configurações  
 │   ├── coleta.py                   # Funções de coleta de tweets  
 │   ├── janelas.py                  # Funções para calcular janelas pré/durante/pós-jogo  
+│   ├── fine_tuning.py              # Script para treinar o BERTimbau (NOVO)
 │   ├── analise_emocoes.py          # Funções de classificação de emoções  
 │   ├── agregacao.py                # Funções de agregação e cálculo de percentuais  
 │   ├── visualizacao.py             # Funções para gráficos e tabelas resumo  
 │   └── utils.py                    # Funções utilitárias para salvar arquivos, criar pastas, etc.  
 │  
-└── .gitignore                       # Ignora .venv, .env, __pycache__, data/, resultados/, etc.  
-  
-
+└── .gitignore                      # Ignora .venv, .env, __pycache__, data/, resultados/, etc.
 ---
 
 ## Requisitos
@@ -77,16 +84,17 @@ pip install -r requirements.txt
 ## Pacotes principais:
 
 - transformers
-
 - torch
-
 - pandas
-
 - matplotlib
-
 - tabulate
-
-- requests  
+- requests
+- scikit-learn
+- datasets
+- accelerate
+- evaluate
+- python-dotenv
+- emoji
 
 ---
 
@@ -105,6 +113,29 @@ LIMITE_PRE_JOGO = 75
 LIMITE_DURANTE_POS = 100
 DURACAO_JANELA = 15  # em minutos
 ```
+
+---
+
+## Fine-tuning do Modelo
+
+Antes da primeira execução, é necessário fazer o fine-tuning no BERTimbau com o dataset manual de tweets:  
+```
+python -m src.fine_tuning
+```
+
+O script:
+
+- Carrega o arquivo data/texto_bruto.csv com os 1.412 tweets rotulados
+
+- Divide os dados em treino (70%), validação (15%) e teste (15%)
+
+- Treina o modelo por 5 épocas
+
+- Salva o modelo em modelo_torcedor_spfc/final/
+
+- Gera métricas e matriz de confusão em modelo_torcedor_spfc/
+
+- Após o fine-tuning, o modelo estará pronto para ser usado na classificação.
 
 ---
 
@@ -165,6 +196,8 @@ Mostra a emoção predominante em cada etapa do jogo (pré, durante e pós).
 - A query de coleta pode ser ajustada em coleta.py caso queira adicionar ou remover hashtags.
 
 - A coleta de tweets diretamente do perfil oficial também é contemplada através de menções (to:@SaoPauloFC).
+
+- O modelo fine-tuning não é incluído no repositório devido ao tamanho. Após o fine-tuning, ele será gerado localmente.
 
 ---
 

@@ -1,7 +1,7 @@
 # /src/agregacao.py
 
 from collections import Counter
-from src.config import EMOCOES
+from .config import EMOCOES
 
 def percentual_emocoes(tweets):
     total = len(tweets)
