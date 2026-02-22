@@ -18,7 +18,7 @@ PERFIL_SPFC = "SaoPauloFC"
 LIMITE_PRE_JOGO = 75
 LIMITE_DURANTE_POS = 100
 
-# Categorias do TCC (ATUALIZADO)
+# Categorias
 EMOCOES = ["raiva", "alegria", "frustracao", "ironia", "neutro"]
 
 # Duração das janelas em minutos
