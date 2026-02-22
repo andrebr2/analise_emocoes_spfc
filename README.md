@@ -5,15 +5,17 @@
 Este projeto realiza uma **análise de emoções em tweets de torcedores do São Paulo Futebol Clube (SPFC)** coletados na plataforma X (antigo Twitter).  
 O objetivo é avaliar o **sentimento da torcida** antes, durante e após os jogos, gerando gráficos de distribuição de emoções e uma tabela resumo das emoções predominantes em cada etapa.
 
-O protótipo coleta tweets:
-- Que interagem com o perfil oficial do SPFC (`@SaoPauloFC`)  
-- Em janelas de tempo definidas:
-  - **Pré-jogo:** 1 hora antes, 4 janelas de 15 minutos  
-  - **Durante o jogo:** 2 horas, 8 janelas de 15 minutos  
-  - **Pós-jogo:** 2 horas, 8 janelas de 15 minutos  
-- Limite de tweets por janela:
-  - Pré-jogo: 75 tweets  
-  - Durante e pós-jogo: 100 tweets  
+O protótipo coleta tweets que são respostas diretas aos tweets publicados pelo perfil oficial do SPFC (@SaoPauloFC), utilizando o ID do perfil obtido dinamicamente via API do X.
+
+A coleta ocorre em janelas temporais definidas:
+
+- Pré-jogo: 1 hora antes (4 janelas de 15 minutos)
+
+- Durante o jogo: 2 horas (8 janelas de 15 minutos)
+
+- Pós-jogo: 2 horas (8 janelas de 15 minutos)
+
+O sistema utiliza paginação da API para coletar todos os tweets disponíveis dentro do intervalo definido.
 
 A classificação de emoções é feita usando o modelo **BERTimbau (neuralmind/bert-base-portuguese-cased)** fine-tuning com um dataset manual de 1.412 tweets rotulados.
 
@@ -103,15 +105,7 @@ pip install -r requirements.txt
 Insira seu Bearer Token da API X no arquivo .env:
 
 ```
-AX_API_TOKEN= = "SEU_TOKEN_AQUI"
-```
-
-Ajuste limites de tweets e duração das janelas se desejar no arquivo config.py:
-
-```
-LIMITE_PRE_JOGO = 75
-LIMITE_DURANTE_POS = 100
-DURACAO_JANELA = 15  # em minutos
+X_API_BEARER_TOKEN=SEU_TOKEN_AQUI
 ```
 
 ---
@@ -190,14 +184,9 @@ Mostra a emoção predominante em cada etapa do jogo (pré, durante e pós).
 
 ## Observações
 
-- Tweets coletados incluem respostas ou menções ao perfil oficial do SPFC e tweets que utilizam hashtags relevantes relacionadas ao clube, como:
-#SPFC, #SãoPauloFC, #VamosSãoPaulo, #Tricolores, #saopaulofc, #spfc, #tricolores.
-
-- A query de coleta pode ser ajustada em coleta.py caso queira adicionar ou remover hashtags.
-
-- A coleta de tweets diretamente do perfil oficial também é contemplada através de menções (to:@SaoPauloFC).
-
-- O modelo fine-tuning não é incluído no repositório devido ao tamanho. Após o fine-tuning, ele será gerado localmente.
+- Tweets coletados correspondem exclusivamente a respostas diretas aos tweets publicados pelo perfil oficial do SPFC.
+- Não são coletadas menções, retweets, citações (quotes) ou tweets apenas com hashtags relacionadas ao clube.
+- A query pode ser ajustada em coleta.py caso se deseje alterar o critério de coleta.
 
 ---
 
